@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, OctagonAlertIcon, GithubIcon, ChromeIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+
 
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     name: z.string().min(1, { message: "Name is required." }),
@@ -29,9 +30,10 @@ const formSchema = z.object({
 });
 
 export const SignUpView = () => {
-    const router = useRouter();
+   
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -47,12 +49,32 @@ export const SignUpView = () => {
             email: values.email,
             password: values.password,
             name: values.name,
+            callbackURL: "/",
         }, {
             onError: (error: any) => {
                 setError(error.message || "Invalid email or password");
                 setIsSubmitting(false);
             },
             onSuccess: () => {
+                setIsSubmitting(false);
+                router.push("/");
+            }
+        });
+    }
+
+    const onSocial = (provider: "github" | "google") => {
+        setIsSubmitting(true);
+        setError(null);
+        authClient.signIn.social(
+            { provider : provider,
+                callbackURL: "/",
+            }, {
+            onError: (error: any) => {
+                setError(error.message || "Authentication Failed");
+                setIsSubmitting(false);
+            },
+            onSuccess: () => {
+                setIsSubmitting(false);
                 router.push("/");
             }
         });
@@ -155,8 +177,8 @@ export const SignUpView = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <Button variant="outline"><GithubIcon className="mr-2 h-4 w-4" />GitHub</Button>
-                        <Button variant="outline"><ChromeIcon className="mr-2 h-4 w-4" />Google</Button>
+                        <Button variant="outline" onClick={() => onSocial("github")}><GithubIcon className="mr-2 h-4 w-4" />GitHub</Button>
+                        <Button variant="outline" onClick={() => onSocial("google")}><ChromeIcon className="mr-2 h-4 w-4" />Google</Button>
                     </div>
 
                     <div className="mt-4 text-center text-sm">
