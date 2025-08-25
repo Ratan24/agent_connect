@@ -71,7 +71,7 @@ export const SignInView = () => {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen"> 
+        <div className="flex flex-col from-sidebar-accent to-sidebar/50 items-center justify-center min-h-screen"> 
             <Card className="w-full max-w-md p-2">
                 <CardContent className="p-6">
                     <div className="flex flex-col items-center justify-center gap-2 mb-6">
