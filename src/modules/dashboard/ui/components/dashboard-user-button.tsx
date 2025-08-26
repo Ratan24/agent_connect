@@ -94,7 +94,7 @@ export const DashboardUserButton = () => {
                  {data.user.image ? (
                     <Avatar className="size-9"><AvatarImage src={data.user.image} /></Avatar>
                 ) : (
-                    <GeneratedAvatar seed={data.user.id} variant="initials" className="size-9" />
+                    <GeneratedAvatar seed={data.user.id} variant="initials" className="size-9 mr-3" />
                 )}
                 <div className="flex flex-col gap-0.5 text-left overflow-hidden flex-1 min-w-0">
                     <p className="text-sm w-full truncate">{data.user.name}</p>
