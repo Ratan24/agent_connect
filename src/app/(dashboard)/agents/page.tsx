@@ -7,8 +7,17 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { SearchParams } from "nuqs";
+import { loadSearchParams } from "@/modules/agents/params";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
 
-const Page = async () => {
+
+interface Props {
+    searchParams: Promise<SearchParams>
+}
+
+const Page = async ({searchParams}: Props) => {
+    const filters = await loadSearchParams(searchParams);
     const session = await auth.api.getSession({
         headers: await headers(),
       });
@@ -17,7 +26,11 @@ const Page = async () => {
       }
 
     const queryClient = getQueryClient();
-    void queryClient.prefetchQuery(trpc.agents.getMany.queryOptions());
+    void queryClient.prefetchQuery(trpc.agents.getMany.queryOptions({pagination: {
+        search: filters.search || undefined,
+        page: filters.page,
+        pageSize: DEFAULT_PAGE_SIZE
+    }}));
     
     return (
         <>
