@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {AgentGetOne} from "../../types";
 import { useForm } from "react-hook-form";
-import { agentInsertSchema } from "../../schemas";
+import { agentsInsertSchema } from "../../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"; 
 import { GeneratedAvatar } from "@/components/generated-avatar";
@@ -19,10 +19,10 @@ import { toast } from "sonner";
 interface AgentFormProps {
     onSuccess: () => void;
     onCancel: () => void;
-    intialValues?: AgentGetOne;
+    initialValues?: AgentGetOne;
 };
 
-export const AgentForm = ({onSuccess, onCancel, intialValues}: AgentFormProps) => {
+export const AgentForm = ({onSuccess, onCancel, initialValues}: AgentFormProps) => {
     const trpc = useTRPC();
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -31,9 +31,20 @@ export const AgentForm = ({onSuccess, onCancel, intialValues}: AgentFormProps) =
         trpc.agents.create.mutationOptions({
             onSuccess: async () => {
                 await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({pagination: {}}));
+                onSuccess?.();
+            },
+            onError: (error)=>{
+                toast.error(error.message); 
+            }
+        }),
+    );
+    const updateAgent = useMutation(
+        trpc.agents.update.mutationOptions({
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({pagination: {}}));
 
-            if (intialValues?.id) {
-                    await queryClient.invalidateQueries(trpc.agents.getOne.queryOptions({id: intialValues.id})
+            if (initialValues?.id) {
+                    await queryClient.invalidateQueries(trpc.agents.getOne.queryOptions({id: initialValues.id})
                 );
                 }
                 onSuccess?.();
@@ -43,22 +54,22 @@ export const AgentForm = ({onSuccess, onCancel, intialValues}: AgentFormProps) =
             }
         }),
     );
-    const form = useForm<z.infer<typeof agentInsertSchema>>({
-        resolver: zodResolver(agentInsertSchema),
+    const form = useForm<z.infer<typeof agentsInsertSchema>>({
+        resolver: zodResolver(agentsInsertSchema),
         defaultValues: {
-            name: intialValues?.name || "",
-            instructions: intialValues?.instructions || "",
+            name: initialValues?.name || "",
+            instructions: initialValues?.instructions || "",
         },
     });
 
-    const isEdit = !!intialValues?.id;
-    const isPending = createAgent.isPending;
+    const isEdit = !!initialValues?.id;
+    const isPending = createAgent.isPending || updateAgent.isPending;
 
-    const onSubmit = (data: z.infer<typeof agentInsertSchema>) => {
+    const onSubmit = (values: z.infer<typeof agentsInsertSchema>) => {
         if (isEdit) {
-            console.log("TODO: updateAgent");
+            updateAgent.mutate({...values, id: initialValues?.id});
         } else {
-            createAgent.mutate(data);
+            createAgent.mutate(values);
         }
     };
 
@@ -98,7 +109,7 @@ export const AgentForm = ({onSuccess, onCancel, intialValues}: AgentFormProps) =
                             <FormMessage />
                         </FormItem>
                     )}
-                />
+                />  
                 <div className="flex justify-between gap-x-2">
                     {onCancel && (
                         <Button
@@ -109,10 +120,10 @@ export const AgentForm = ({onSuccess, onCancel, intialValues}: AgentFormProps) =
                     )}
                     <Button disabled={isPending} type="submit">
                         {isEdit ? "Update" : "Create"}
-                    </Button>
+                    </Button>   
                 </div>
             </form>
         </Form>
     )
 
-}
+}                       
