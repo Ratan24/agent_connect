@@ -13,7 +13,7 @@ import { useState } from "react";
 import { UpcomingState } from "../components/upcoming-state";
 import { ActiveState } from "../components/active-state";
 import { CancelledState } from "../components/cancelled-state";
-import { ProcessingState } from "../components/preocessing-state";
+import { ProcessingState } from "../components/processing-state";
 
 
 interface Props {
