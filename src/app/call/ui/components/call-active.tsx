@@ -20,7 +20,6 @@ export const CallActive = ({onLeave, meetingName}: Props) => {
                 <Link href="/" className="flex items-center justify-center p-1 bg-white rounded-full w-fit">
                 <Image src="/logo.svg" alt="Agent Connect" width={22} height={22} />
                 </Link>
-
                 <h4 className="text-base">{meetingName}</h4>
             </div>
             <SpeakerLayout />
