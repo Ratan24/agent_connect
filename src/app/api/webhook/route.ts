@@ -55,15 +55,19 @@ export async function POST(req: NextRequest) {
     const eventType = (payload as Record<string, unknown>)?.type;
 
     if (eventType ==="call.session.started") {
+        console.log("call.session.started event received");
         const event = payload as CallSessionStartedEvent;
         const meetingId = event.call.custom?.meetingId as string;
 
         if (!meetingId) {
+            console.error("Missing meetingId in event payload");
             return NextResponse.json(
                 {error: "Missing meeting id"},
                 {status: 400}
             );
         }
+        console.log(`Processing meetingId: ${meetingId}`);
+
         const [existingMeeting] = await db.select().from(meetings).where(
             and(eq(meetings.id, meetingId), 
             not(eq(meetings.status, "completed")),
@@ -73,14 +77,24 @@ export async function POST(req: NextRequest) {
         ));
 
         if (!existingMeeting) {
+            console.error(`Meeting not found for meetingId: ${meetingId}`);
             return NextResponse.json(
                 {error: "Meeting not found"},
                 {status: 400}
             );
         }
+        console.log(`Found existing meeting: ${JSON.stringify(existingMeeting)}`);
 
         const [existingAgent] = await db.select().from(agents).where(eq(agents.id, existingMeeting.agentId));
 
+        if (!existingAgent) {
+            console.error(`Agent not found for agentId: ${existingMeeting.agentId}`);
+            return NextResponse.json(
+                {error: "Agent not found"},
+                {status: 400}
+            );
+        }
+        console.log(`Found existing agent: ${JSON.stringify(existingAgent)}`);
     
         
         await db.update(meetings).set({
@@ -91,15 +105,21 @@ export async function POST(req: NextRequest) {
 
         const call = streamVideo.video.call("default", meetingId);
 
-        const realtimeClient = await streamVideo.video.connectOpenAi({
-            call,
-            openAiApiKey: process.env.OPENAI_API_KEY!,
-            agentUserId: existingAgent.id,
-        })
+        try {
+            console.log("Connecting OpenAI agent...");
+            const realtimeClient = await streamVideo.video.connectOpenAi({
+                call,
+                openAiApiKey: process.env.OPENAI_API_KEY!,
+                agentUserId: existingAgent.id,
+            })
 
-        realtimeClient.updateSession({
-            instructions: existingAgent.instructions,
-        });
+            realtimeClient.updateSession({
+                instructions: existingAgent.instructions,
+            });
+            console.log("OpenAI agent connected and session updated");
+        } catch (error) {
+            console.error("Error connecting OpenAI agent:", error);
+        }
     } else if (eventType === "call.session_participant_left") {
         const event = payload as CallSessionParticipantLeftEvent;
         const meetingId = event.call_cid.split(":")[1];
@@ -112,7 +132,10 @@ export async function POST(req: NextRequest) {
         }
         
         const call = streamVideo.video.call("default", meetingId);
-        await call.end();
+        const { participants } = await call.query();
+        if (participants.length === 0) {
+            await call.end();
+        }
     }
     
 
