@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
         }
         
         const call = streamVideo.video.call("default", meetingId);
-        const { participants } = await call.query();
+        const { participants } = await call.get();
         if (participants.length === 0) {
             await call.end();
         }
