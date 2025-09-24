@@ -15,6 +15,8 @@ import {
   ClockFadingIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Transcript } from "./transcript";
+import { ChatProvider } from "./chat-provider";
 
 interface Props {
   data: MeetingGetOne;
@@ -155,7 +157,7 @@ export const CompletedState = ({ data }: Props) => {
 
         <TabsContent value="transcript">
           {/* Content for the Transcript tab goes here */}
-          <p>Transcript Content</p>
+          <Transcript meetingId={data.id} />
         </TabsContent>
 
 
@@ -172,7 +174,7 @@ export const CompletedState = ({ data }: Props) => {
 
         <TabsContent value="chat">
           {/* Content for the Chat tab goes here */}
-          <p>Chat Content</p>
+          <ChatProvider meetingId={data.id} meetingName={data.name} />
         </TabsContent>
       </Tabs>
     </div>
