@@ -31,10 +31,15 @@ export const AgentForm = ({onSuccess, onCancel, initialValues}: AgentFormProps) 
         trpc.agents.create.mutationOptions({
             onSuccess: async () => {
                 await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({pagination: {}}));
+                await queryClient.invalidateQueries(trpc.premium.getFreeUsage.queryOptions());
                 onSuccess?.();
             },
             onError: (error)=>{
                 toast.error(error.message); 
+
+                if (error.data?.code === "FORBIDDEN") {
+                    router.push("/upgrade");
+                }
             }
         }),
     );

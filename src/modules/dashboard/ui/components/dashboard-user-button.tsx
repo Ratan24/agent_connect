@@ -72,7 +72,7 @@ export const DashboardUserButton = () => {
                     </DrawerHeader>
                     <DrawerFooter>
                         {/* FIX: Added correct onClick handlers to mobile buttons */}
-                        <Button variant="outline" className="w-full justify-start gap-x-2" onClick={onBilling}>
+                        <Button variant="outline" className="w-full justify-start gap-x-2" onClick={() => authClient.customer.portal()}>
                             <CreditCardIcon className="size-4" />
                             Billing
                         </Button>
@@ -109,7 +109,7 @@ export const DashboardUserButton = () => {
                 </div>
                 <DropdownMenuSeparator />
                 {/* FIX: Added correct onClick handler to the Billing item */}
-                <DropdownMenuItem className="cursor-pointer flex items-center justify-between" onClick={onBilling}>
+                <DropdownMenuItem className="cursor-pointer flex items-center justify-between" onClick={() => authClient.customer.portal()}>
                     Billing
                     <CreditCardIcon className="size-4" />
                 </DropdownMenuItem>

@@ -29,9 +29,12 @@ export const MeetingIdView = ({meetingId}: Props) => {
     const router = useRouter();
     const [RemoveConfirmation, confirmRemove] = useConfirm ("Are you sure", `The following action will remove this meeting`);
     const [updateMeetingDialogOpen, setUpdateMeetingDialogOpen] = useState(false);
+
+
     const removeMeeting = useMutation(trpc.meetings.remove.mutationOptions({
-        onSuccess: ()=>{
-            queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({pagination: {}}));
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(trpc.meetings.getMany.queryOptions({pagination: {}}));
+            await queryClient.invalidateQueries(trpc.premium.getFreeUsage.queryOptions());
             router.push("/meetings");
         },
         onError: (error)=>{
