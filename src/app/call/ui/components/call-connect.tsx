@@ -9,7 +9,6 @@ import {
     StreamCall,
     StreamVideo,
     StreamVideoClient,
-    StreamVideoProvider,
 } from "@stream-io/video-react-sdk";
 
 import {useTRPC} from "@/trpc/client";

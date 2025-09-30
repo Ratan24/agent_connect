@@ -12,8 +12,8 @@ export const CallView = ({meetingId}: Props) => {
     const {data} = useSuspenseQuery(trpc.meetings.getOne.queryOptions({id: meetingId}));
 
     return (
-        <div>
-            JSON.stringify(data, null, 2)
-        </div>
+        <pre className="text-xs whitespace-pre-wrap break-all">
+            {JSON.stringify(data, null, 2)}
+        </pre>
     )
 }
