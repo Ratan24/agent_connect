@@ -10,7 +10,7 @@ import {
     CallSessionStartedEvent,
 } from "@stream-io/node-sdk";
 
-import {and, eq, not} from "drizzle-orm";
+import {and, eq} from "drizzle-orm";
 
 
 import {NextRequest, NextResponse} from "next/server";
@@ -25,7 +25,6 @@ import {streamVideo} from "@/lib/stream-video";
 
 import {generateAvatarUri} from "@/lib/avatar";
 import { streamChat } from "@/lib/stream-chat";
-import { avataaarsNeutral } from "@dicebear/collection";
 
 const openaiClient = new OpenAi({
     apiKey: process.env.OPENAI_API_KEY!,
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
     let payload: unknown;
     try {
         payload = JSON.parse(body) as Record<string, unknown>;
-    } catch (error) {
+    } catch {
         return NextResponse.json({error: "Invalid payload"}, {status: 400});
     }
 

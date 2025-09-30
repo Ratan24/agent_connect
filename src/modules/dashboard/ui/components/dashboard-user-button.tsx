@@ -40,9 +40,7 @@ export const DashboardUserButton = () => {
         });
     };
 
-    const onBilling = () => {
-        router.push("/billing");
-    };
+    // removed unused onBilling
 
     if (isPending || !data?.user) {
         return null;

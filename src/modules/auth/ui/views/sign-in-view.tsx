@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const formSchema = z.object({
     email: z.string().email({ message: "Please enter a valid email." }),
@@ -41,8 +42,9 @@ export const SignInView = () => {
             password: values.password,
             callbackURL: "/",
         }, {        
-            onError: (error: any) => {
-                setError(error.message || "Invalid email or password");
+            onError: (error: unknown) => {
+                const message = error instanceof Error ? error.message : "Invalid email or password";
+                setError(message);
                 setIsSubmitting(false);
             },
             onSuccess: () => {
@@ -59,8 +61,9 @@ export const SignInView = () => {
             { provider : provider,
                 callbackURL: "/",
             }, {
-            onError: (error: any) => {
-                setError(error.message || "Authentication Failed");
+            onError: (error: unknown) => {
+                const message = error instanceof Error ? error.message : "Authentication Failed";
+                setError(message);
                 setIsSubmitting(false);
             },
             onSuccess: () => {
@@ -75,7 +78,7 @@ export const SignInView = () => {
             <Card className="w-full max-w-md p-2">
                 <CardContent className="p-6">
                     <div className="flex flex-col items-center justify-center gap-2 mb-6">
-                        <img src="/logo.svg" alt="logo" className="h-16 w-16"/>
+                        <Image src="/logo.svg" alt="logo" width={64} height={64} className="h-16 w-16" />
                         <p className="text-xl font-bold">Agent Connect</p>
                     </div>
 
